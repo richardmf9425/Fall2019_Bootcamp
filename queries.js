@@ -1,36 +1,56 @@
-/* Add all the required libraries*/
+/* Add all the required libraries */
+const mongoose = require('mongoose');
+const Listing = require('./ListingSchema');
+const config = require('./config');
 
-/* Connect to your database using mongoose - remember to keep your key secret*/
+mongoose.set('useFindAndModify', false);
+mongoose.set('useUnifiedTopology', true);
+mongoose.connect(config.db.uri, { useNewUrlParser: true }).then().catch(e => console.error(e));
 
-/* Fill out these functions using Mongoose queries*/
-//Check out - https://mongoosejs.com/docs/queries.html
+const findLibraryWest = async () => {
+  try {
+    const west = await Listing.findOne({ name: 'Library West' });
+    console.log(west);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
-var findLibraryWest = function() {
-  /* 
-    Find the document that contains data corresponding to Library West,
-    then log it to the console. 
-   */
+const removeCable = async () => {
+  let course;
+
+  try {
+    course = await Listing.findOneAndRemove({ code: 'CABL' }, (err, doc) => {
+      if (err) console.error(err);
+      console.log(doc);
+    });
+  } catch (error) {
+    console.error(error);
+  }
 };
-var removeCable = function() {
-  /*
-    Find the document with the code 'CABL'. This cooresponds with courses that can only be viewed 
-    on cable TV. Since we live in the 21st century and most courses are now web based, go ahead
-    and remove this listing from your database and log the document to the console. 
-   */
+const updatePhelpsLab = async () => {
+  const updatedAddress = '1953 Museum Rd Gainesville, FL 32603';
+  try {
+    const Phelps = await Listing.findOneAndUpdate(
+      { name: 'Phelps Laboratory' },
+      { $set: { address: updatedAddress } },
+      { new: true },
+    );
+    console.log(Phelps);
+  } catch (err) {
+    console.error(err);
+  }
 };
-var updatePhelpsMemorial = function() {
-  /*
-    Phelps Memorial Hospital Center's address is incorrect. Find the listing, update it, and then 
-    log the updated document to the console. 
-   */
-};
-var retrieveAllListings = function() {
-  /* 
-    Retrieve all listings in the database, and log them to the console. 
-   */
+const retrieveAllListings = async () => {
+  try {
+    const allListings = await Listing.find({});
+    console.log(allListings);
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 findLibraryWest();
 removeCable();
-updatePhelpsMemorial();
+updatePhelpsLab();
 retrieveAllListings();
